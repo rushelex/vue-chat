@@ -1,20 +1,18 @@
 <template>
   <v-app app>
-    <v-navigation-drawer v-model="drawer" app>
+    <v-navigation-drawer v-model="drawer" app mobile-break-poink="650">
       <v-list subheader>
         <v-subheader>Пользователи в чате</v-subheader>
 
         <v-list-item v-for="u in users" :key="u.id" @click.prevent>
-          <v-list-item-avatar>
-            <v-img :src="u.avatar"></v-img>
-          </v-list-item-avatar>
-
           <v-list-item-content>
             <v-list-item-title>{{ u.name }}</v-list-item-title>
           </v-list-item-content>
 
           <v-list-item-icon>
-            <v-icon :color="u.active ? 'primary' : 'grey'">mdi-message</v-icon>
+            <v-icon :color="u.id === user.id ? 'primary' : 'grey'"
+              >mdi-message</v-icon
+            >
           </v-list-item-icon>
         </v-list-item>
       </v-list>
@@ -31,7 +29,7 @@
     </v-app-bar>
 
     <v-content>
-      <div class="ma-12">
+      <div style="height: 100%;">
         <nuxt />
       </div>
     </v-content>
@@ -44,35 +42,26 @@ import { mapState, mapMutations } from 'vuex'
 export default {
   data() {
     return {
-      drawer: false,
-      users: [
-        {
-          id: 1,
-          name: 'User 1',
-          active: false
-        },
-        {
-          id: 2,
-          name: 'User 2',
-          active: true
-        },
-        {
-          id: 3,
-          name: 'User 3',
-          active: false
-        }
-      ]
+      drawer: true
     }
   },
 
-  computed: mapState(['user']),
+  computed: mapState(['user', 'users']),
 
   methods: {
     ...mapMutations(['clearData']),
     exit() {
-      this.$router.push('/?message=leftChat')
-      this.clearData()
+      this.$socket.emit('userLeft', this.user.id, () => {
+        this.$router.push('/?message=leftChat')
+        this.clearData()
+      })
     }
   }
 }
 </script>
+
+<style lang="scss">
+html {
+  overflow: hidden;
+}
+</style>

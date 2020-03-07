@@ -31,6 +31,13 @@
         </v-card-text>
       </v-card>
     </v-flex>
+
+    <v-snackbar v-model="snackbar" :timeout="6000" top>
+      {{ message }}
+      <v-btn color="red" text @click="snackbar = false">
+        Закрыть
+      </v-btn>
+    </v-snackbar>
   </v-layout>
 </template>
 
@@ -40,6 +47,8 @@ import { mapMutations } from 'vuex'
 export default {
   data: () => ({
     valid: true,
+    snackbar: false,
+    message: '',
     name: '',
     nameRules: [
       (v) => !!v || 'Введите имя',
@@ -55,6 +64,18 @@ export default {
     connect() {
       console.log('Client IO connected')
     }
+  },
+
+  mounted() {
+    const { message } = this.$route.query
+
+    if (message === 'noUser') {
+      this.message = 'Ошибка: введите данные'
+    } else if (message === 'leftChat') {
+      this.message = 'Вы вышли из чата'
+    }
+
+    this.snackbar = !!this.message
   },
 
   methods: {
